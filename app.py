@@ -13,14 +13,20 @@ def clean_housing(text):
     if not text or pd.isna(text): return ""
     return str(text).upper().replace("POD", "").strip()
 
-def clean_webex(staff_name, staff_email):
-    text = (str(staff_name) + " " + str(staff_email)).upper()
-    mapping = {"ALPHA": "A", "APOD": "A", "BRAVO": "B", "BPOD": "B", "CHARLIE": "C", 
-               "CPOD": "C", "EDWARD": "E", "EPOD": "E", "FOXTROT": "F", "FPOD": "F", 
-               "INDIA": "I", "IPOD": "I", "CENTRAL": "CENTRAL"}
+def clean_webex(staff_name, staff_email, service_name):
+    # Combines all columns to search for the location letter
+    text = (str(staff_name) + " " + str(staff_email) + " " + str(service_name)).upper()
+    
+    mapping = {
+        "ALPHA": "A", "APOD": "A", "BRAVO": "B", "BPOD": "B", 
+        "CHARLIE": "C", "CPOD": "C", "EDWARD": "E", "EPOD": "E", 
+        "FOXTROT": "F", "FPOD": "F", "G POD": "G", "WEBEXG": "G", 
+        "INDIA": "I", "IPOD": "I", "WEBEXI": "I", "CENTRAL": "CENTRAL"
+    }
+    
     for key, val in mapping.items():
         if key in text: return val
-    return "Check File"
+    return "Check"
 
 def format_inmate_info(name_str, dob_str):
     names = [n.strip() for n in str(name_str).split(';') if n.strip()]
