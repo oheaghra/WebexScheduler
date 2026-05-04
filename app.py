@@ -89,7 +89,7 @@ if uploaded_file is not None:
         email_run.font.size = Pt(12)
         email_run.font.name = 'Courier New'
         
-        row_cells[4].paragraphs[0].add_run(clean_webex(row['Staff Name'], row['Staff Email'])).font.size = Pt(11)
+        row_cells[4].paragraphs[0].add_run(clean_webex(row['Staff Name'], row['Staff Email'], row['Service'])).font.size = Pt(11)
 
     # Save to a "buffer" so the user can download it
     target_name = f"Webex_Schedule_{header_date.replace('/', '-')}.docx"
