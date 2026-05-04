@@ -7,44 +7,38 @@ from docx import Document
 from docx.shared import Pt
 from docx.enum.section import WD_ORIENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
+
+# --- HELPER FUNCTIONS ---
+def set_cell_shading(cell, fill):
+    shading_elm = parse_xml(r'<w:shd {} w:fill="{}"/>'.format(nsdecls('w'), fill))
+    cell._tc.get_or_add_tcPr().append(shading_elm)
 
 def clean_housing(text):
     if not text or pd.isna(text): return ""
     return str(text).upper().replace("POD", "").strip()
 
 def clean_webex(staff_name, staff_email, service_name):
-    # Combine all fields to search
     text = (str(staff_name) + " " + str(staff_email) + " " + str(service_name)).upper()
-    
-    # Specific map for common Augusta Webex naming conventions
-    mapping = {
-        "ALPHA": "A", "APOD": "A",
-        "BRAVO": "B", "BPOD": "B",
-        "CHARLIE": "C", "CPOD": "C", "WEBEXC": "C",
-        "EDWARD": "E", "EPOD": "E",
-        "FOXTROT": "F", "FPOD": "F",
-        "G POD": "G", "WEBEXG": "G", "GPOD": "G",
-        "INDIA": "I", "IPOD": "I", "WEBEXI": "I",
-        "CENTRAL": "CENTRAL"
-    }
-    
+    mapping = {"ALPHA": "A", "APOD": "A", "BRAVO": "B", "BPOD": "B", "CHARLIE": "C", 
+               "CPOD": "C", "WEBEXC": "C", "EDWARD": "E", "EPOD": "E", "FOXTROT": "F", 
+               "FPOD": "F", "G POD": "G", "WEBEXG": "G", "INDIA": "I", "IPOD": "I", 
+               "WEBEXI": "I", "CENTRAL": "CENTRAL"}
     for key, val in mapping.items():
         if key in text: return val
-    
-    # Final safety net: Look for any single letter immediately followed by "POD" or "WEBEX"
     import re
     match = re.search(r'([A-Z])[\s-]*(?:POD|WEBEX)', text)
-    if match:
-        return match.group(1)
-        
+    if match: return match.group(1)
     return "Check"
 
 def parse_cf(cf_str):
     try: return json.loads(cf_str)
     except: return {}
 
+# --- STREAMLIT WEB INTERFACE ---
 st.set_page_config(page_title="Webex Scheduler", layout="wide")
-st.title("📂 Webex Schedule Formatter (Auto-Merge Mode)")
+st.title("📂 Webex Schedule Formatter")
 
 uploaded_file = st.file_uploader("Choose a TSV file", type="tsv")
 
@@ -59,7 +53,6 @@ if uploaded_file is not None:
     for (dt_raw, name_low, email), group in groups:
         base = group.iloc[0]
         names, dobs = [], []
-        
         for _, row in group.iterrows():
             cf = parse_cf(row[' Custom Fields'])
             names.extend([n.strip() for n in str(cf.get('INMATE NAME', '')).split(';') if n.strip()])
@@ -94,8 +87,20 @@ if uploaded_file is not None:
         run = table.rows[0].cells[i].paragraphs[0].add_run(h)
         run.bold, run.font.size = True, Pt(11)
 
+    # Shading variables
+    last_time = None
+    shading_on = False
+    gray_hex = "E7E6E6"
+    
     for r in processed_rows:
+        if r['time'] != last_time:
+            shading_on = not shading_on
+            last_time = r['time']
+            
         row_cells = table.add_row().cells
+        if shading_on:
+            for cell in row_cells: set_cell_shading(cell, gray_hex)
+        
         row_cells[0].paragraphs[0].add_run((r['time'] + timedelta(minutes=15)).strftime('%I:%M %p')).font.size = Pt(11)
         row_cells[1].paragraphs[0].add_run(r['inmates']).font.size = Pt(11)
         row_cells[2].paragraphs[0].add_run(r['housing']).font.size = Pt(11)
