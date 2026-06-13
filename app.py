@@ -21,10 +21,10 @@ def clean_housing(text):
 
 def clean_webex(staff_name, staff_email, service_name):
     text = (str(staff_name) + " " + str(staff_email) + " " + str(service_name)).upper()
-    mapping = {"ALPHA": "A1", "APOD": "A2", "BRAVO": "B", "BPOD": "B", "CHARLIE": "C1", 
+    mapping = {"ALPHA": "A", "BRAVO": "B", "BPOD": "B", "CHARLIE": "C", 
                "CPOD": "C2", "WEBEXC": "C3", "EDWINAPOD": "E", "EPODWEBEX": "E", "EDWINA": "E", "FRANKIE": "F",
                "EPODWEBEX": "E",
-               "FPOD": "F", "G POD": "G1", "WEBEXG": "G2", "INDIA": "I", "IPOD": "I", 
+               "FPOD": "F", "G POD": "G", "WEBEXG": "G2", "INDIA": "I", "IPOD": "I", 
                "WEBEXI": "I", "CENTRAL": "CENTRAL", "H POD (MEDICAL) MALE": "F", "H POD (MEDICAL) FEMALE": "E"}
     for key, val in mapping.items():
         if key in text: return val
