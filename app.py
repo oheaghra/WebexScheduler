@@ -25,7 +25,7 @@ def clean_webex(staff_name, staff_email, service_name):
                "CPOD": "C2", "WEBEXC": "C3", "EDWINAPOD": "E", "EPODWEBEX": "E", "EDWINA": "E", "FRANKIE": "F",
                "EPODWEBEX": "E",
                "FPOD": "F", "G POD": "G", "WEBEXG": "G2", "INDIA": "I", "IPOD": "I", 
-               "WEBEXI": "I", "CENTRAL": "CENTRAL", "H POD (MEDICAL) MALE": "F", "H POD (MEDICAL) FEMALE": "E"}
+               "WEBEXI": "I", "CENTRAL": "CENTRAL", "H POD (MEDICAL) MALE": "H", "H POD (MEDICAL) FEMALE": "H"}
     for key, val in mapping.items():
         if key in text: return val
     import re
